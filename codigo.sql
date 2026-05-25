@@ -1,3 +1,5 @@
+CREATE DATABASE hotel;
+USE hotel;
 CREATE TABLE tipo_reserva (
     id_tiporeserva  INT,
     origem          VARCHAR(100) NOT NULL
