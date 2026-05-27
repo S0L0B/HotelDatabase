@@ -1,47 +1,49 @@
-CREATE DATABASE hotel;
+CREATE DATABASE  hotel
+    
 USE hotel;
+
 CREATE TABLE tipo_reserva (
     id_tiporeserva  INT,
-    origem          VARCHAR(100) NOT NULL
+    origem          ENUM(’site’, ‘presencial’, ‘tel’)
 );
 
 CREATE TABLE tipo_quarto (
     id_tipoquarto   INT,
-    tipo            VARCHAR(50) NOT NULL,
-    nivel           VARCHAR(50)
+    tipo            ENUM(’single’, ‘double’, ’twin’)
+    nivel           ENUM(‘standard’, ‘deluxe’, ‘suite’)
 );
 
 CREATE TABLE quarto (
-    id_quarto   INT,
-    status      VARCHAR(50),
-    numero      INT NOT NULL,
-    id_tipoquarto INT
+    id_quarto       INT,
+    status             ENUM(‘disponível, ‘ocupado, ‘limpeza’),
+    numero          INT NOT NULL,
+    id_tipoquarto   INT
 );
 
-CREATE TABLE departamento_cargo (
+CREATE TABLE departamento (
     id_departamento INT,
-    nome            VARCHAR(100) NOT NULL
+    nome            VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE cargo_funcionario (
     id_cargo        INT,
-    nome            VARCHAR(100) NOT NULL,
+    nome            VARCHAR(50) NOT NULL,
     id_departamento INT
 );
 
 CREATE TABLE funcionario (
     id_funcionario   INT,
-    nome             VARCHAR(100) NOT NULL,
-    cpf              VARCHAR(11)  NOT NULL,
-    email            VARCHAR(100),
+    nome             VARCHAR(50) NOT NULL,
+    cpf              VARCHAR(14)  NOT NULL,
+    email            VARCHAR(50),
     data_contratacao DATE         NOT NULL,
     ativo_sn         CHAR(1)      NOT NULL DEFAULT 'S',
-    id_cargo         INT
+    id_cargo_funcionario         INT
 );
 
 CREATE TABLE tel_funcionario (
     id_telfuncionario INT,
-    tipo              VARCHAR(30),
+    tipo                   ENUM(‘cel’, ‘com’, ‘res’)
     numero            VARCHAR(20),
     id_funcionario    INT
 );
@@ -49,21 +51,19 @@ CREATE TABLE tel_funcionario (
 CREATE TABLE endereco_funcionario (
     id_endereco    INT,
     id_funcionario INT,
-    logradouro     VARCHAR(150) NOT NULL,
-    numero         VARCHAR(10),
-    bairro         VARCHAR(100),
-    cidade         VARCHAR(100),
-    complemento    VARCHAR(100),
+    logradouro     VARCHAR(50) NOT NULL,
+    numero         VARCHAR(5),
+    bairro         VARCHAR(20),
+    cidade         VARCHAR(15),
+    complemento    VARCHAR(20),
     estado         CHAR(2)
 );
 
+
 CREATE TABLE cliente (
     id_cliente    INT,
-    nome          VARCHAR(100) NOT NULL,
-    cpf           VARCHAR(11)  NOT NULL,
-    email         VARCHAR(100),
-    data_cadastro DATE,
-    status_cred   VARCHAR(50)
+    data_cadastro DATE        
+    status_cred      ENUM(‘ativo’, ‘bloqueado’)
 );
 
 CREATE TABLE cliente_pessoa (
@@ -75,22 +75,22 @@ CREATE TABLE cliente_pessoa (
 CREATE TABLE pessoa_juridica (
     id_pessoa_juridica INT,
     id_cliente_pessoa  INT,
-    razao_social       VARCHAR(150) NOT NULL,
+    razao_social       VARCHAR(255) NOT NULL,
     cnpj               VARCHAR(18)  NOT NULL,
-    email              VARCHAR(100)
+    email              VARCHAR(50)
 );
 
 CREATE TABLE pessoa_fisica (
     id_pessoa_fisica  INT,
     id_cliente_pessoa INT,
     nome              VARCHAR(100) NOT NULL,
-    cpf               VARCHAR(11)  NOT NULL,
-    email             VARCHAR(100)
+    cpf               VARCHAR(14)  NOT NULL,
+    email             VARCHAR(50)
 );
 
 CREATE TABLE tel_cliente (
     id_telcliente INT,
-    tipo          VARCHAR(30),
+    tipo          ENUM(‘cel’, ‘com’, ‘res’),
     numero        VARCHAR(20),
     id_cliente    INT
 );
@@ -98,17 +98,18 @@ CREATE TABLE tel_cliente (
 CREATE TABLE endereco_cliente (
     id_endereco INT,
     id_cliente  INT,
-    logradouro  VARCHAR(150) NOT NULL,
-    numero      VARCHAR(10),
-    bairro      VARCHAR(100),
-    cidade      VARCHAR(100),
-    complemento VARCHAR(100),
+    logradouro  VARCHAR(50) NOT NULL,
+    numero      VARCHAR(5),
+    bairro      VARCHAR(20),
+    cidade      VARCHAR(15),
+    complemento VARCHAR(20),
     estado      CHAR(2)
 );
 
+
 CREATE TABLE reserva (
     id_reserva      INT,
-    data_criacao    DATE,
+    data_criacao    DATE DEFAULT (CURRENT_DATE),
     id_tiporeserva  INT,
     id_tipoquarto   INT,
     id_cliente      INT,
@@ -117,32 +118,33 @@ CREATE TABLE reserva (
 
 CREATE TABLE checkin (
     id_checkin     INT,
-    datahora       DATETIME,
-    status         VARCHAR(50),
+    datahora       DATE,
+    status         ENUM(‘pendente, ‘ativo’, ‘finalizado’, ‘cancelado’)
     id_quarto      INT,
     id_reserva     INT,
     id_funcionario INT
 );
 
+
 CREATE TABLE checkout (
     id_checkout    INT,
     valor_total    DECIMAL(10,2),
-    metodo_pag     VARCHAR(50),
+    metodo_pag     ENUM(‘cartao, ‘transferencia’, ‘cedula’)
     id_checkin     INT,
     id_funcionario INT
 );
 
 CREATE TABLE consumo (
-    id_item    INT,
-    quantidade INT,
-    valor      DECIMAL(10,2),
-    id_checkin INT
+    id_item     INT,
+    quantidade  INT,
+    valor       DECIMAL(10,2),
+    id_checkin  INT
 );
 
 CREATE TABLE hospedes (
     id_hospede   INT,
-    nome         VARCHAR(100),
-    cpf          VARCHAR(11),
+    nome         VARCHAR(50),
+    cpf          VARCHAR(14),
     data_nasc    DATE,
     sexo         CHAR(1),
     preferencias TEXT,
@@ -151,10 +153,11 @@ CREATE TABLE hospedes (
 
 CREATE TABLE tel_hospede (
     id_telhospede INT,
-    tipo          VARCHAR(30),
+    tipo          ENUM(‘cel’, ‘com’, ‘res’),
     numero        VARCHAR(20),
     id_hospede    INT
 );
+
 
 ALTER TABLE tipo_reserva
 ADD CONSTRAINT PK_TIPO_RESERVA
@@ -256,12 +259,9 @@ ADD CONSTRAINT PK_TEL_HOSPEDE
 PRIMARY KEY (id_telhospede),
 MODIFY id_telhospede INT AUTO_INCREMENT;
 
+
 ALTER TABLE funcionario
 ADD CONSTRAINT UQ_CPF_FUNCIONARIO
-UNIQUE (cpf);
-
-ALTER TABLE cliente
-ADD CONSTRAINT UQ_CPF_CLIENTE
 UNIQUE (cpf);
 
 ALTER TABLE pessoa_juridica
@@ -272,6 +272,83 @@ ALTER TABLE pessoa_fisica
 ADD CONSTRAINT UQ_CPF_PESSOA_FISICA
 UNIQUE (cpf);
 
+ALTER TABLE checkout
+ADD CONSTRAINT UQ_CHECKOUT_CHECKIN
+UNIQUE (id_checkin);
+
+ALTER TABLE funcionario
+ADD CONSTRAINT CHK_ATIVO_SN
+CHECK (ativo_sn IN ('S', 'N'));
+
+ALTER TABLE cliente_pessoa
+ADD CONSTRAINT CHK_TIPO_PESSOA
+CHECK (tipo_pessoa IN ('PF', 'PJ'));
+
+ALTER TABLE hospedes
+ADD CONSTRAINT CHK_SEXO
+CHECK (sexo IN ('M', 'F', 'O'));
+
+ALTER TABLE consumo
+ADD CONSTRAINT CHK_QUANTIDADE
+CHECK (quantidade > 0);
+
+ALTER TABLE consumo
+ADD CONSTRAINT CHK_VALOR
+CHECK (valor >= 0);
+
+ALTER TABLE quarto
+MODIFY id_tipoquarto INT NOT NULL;
+
+ALTER TABLE cargo_funcionario
+MODIFY id_departamento INT NOT NULL;
+
+ALTER TABLE funcionario
+MODIFY id_cargo INT NOT NULL;
+
+ALTER TABLE tel_funcionario
+MODIFY id_funcionario INT NOT NULL;
+
+ALTER TABLE endereco_funcionario
+MODIFY id_funcionario INT NOT NULL;
+
+ALTER TABLE cliente_pessoa
+MODIFY id_cliente INT NOT NULL;
+
+ALTER TABLE pessoa_juridica
+MODIFY id_cliente_pessoa INT NOT NULL;
+
+ALTER TABLE pessoa_fisica
+MODIFY id_cliente_pessoa INT NOT NULL;
+
+ALTER TABLE tel_cliente
+MODIFY id_cliente INT NOT NULL;
+
+ALTER TABLE endereco_cliente
+MODIFY id_cliente INT NOT NULL;
+
+ALTER TABLE reserva
+MODIFY id_tiporeserva  INT NOT NULL,
+MODIFY id_tipoquarto   INT NOT NULL,
+MODIFY id_cliente      INT NOT NULL,
+MODIFY id_funcionario  INT NOT NULL;
+
+ALTER TABLE checkin
+MODIFY id_quarto      INT NOT NULL,
+MODIFY id_reserva     INT NOT NULL,
+MODIFY id_funcionario INT NOT NULL;
+
+ALTER TABLE checkout
+MODIFY id_checkin     INT NOT NULL,
+MODIFY id_funcionario INT NOT NULL;
+
+ALTER TABLE consumo
+MODIFY id_checkin INT NOT NULL;
+
+ALTER TABLE hospedes
+MODIFY id_checkin INT NOT NULL;
+
+ALTER TABLE tel_hospede
+MODIFY id_hospede INT NOT NULL;
 
 ALTER TABLE quarto
 ADD CONSTRAINT FK_QUARTO_TIPOQUARTO
@@ -332,6 +409,11 @@ ALTER TABLE reserva
 ADD CONSTRAINT FK_RESERVA_TIPOQUARTO
 FOREIGN KEY (id_tipoquarto)
 REFERENCES tipo_quarto (id_tipoquarto);
+
+ALTER TABLE reserva
+ADD CONSTRAINT FK_RESERVA_QUARTO
+FOREIGN KEY (id_quarto)
+REFERENCES quarto (id_quarto);
 
 ALTER TABLE reserva
 ADD CONSTRAINT FK_RESERVA_CLIENTE
