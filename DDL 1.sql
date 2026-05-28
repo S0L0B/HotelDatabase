@@ -1,6 +1,23 @@
-CREATE DATABASE hotel;
-
-USE hotel;
+DROP TABLE IF EXISTS tel_hospede;
+DROP TABLE IF EXISTS hospedes;
+DROP TABLE IF EXISTS consumo;
+DROP TABLE IF EXISTS checkout;
+DROP TABLE IF EXISTS checkin;
+DROP TABLE IF EXISTS reserva;
+DROP TABLE IF EXISTS endereco_cliente;
+DROP TABLE IF EXISTS tel_cliente;
+DROP TABLE IF EXISTS pessoa_fisica;
+DROP TABLE IF EXISTS pessoa_juridica;
+DROP TABLE IF EXISTS cliente_pessoa;
+DROP TABLE IF EXISTS cliente;
+DROP TABLE IF EXISTS endereco_funcionario;
+DROP TABLE IF EXISTS tel_funcionario;
+DROP TABLE IF EXISTS funcionario;
+DROP TABLE IF EXISTS cargo_funcionario;
+DROP TABLE IF EXISTS departamento;
+DROP TABLE IF EXISTS quarto;
+DROP TABLE IF EXISTS tipo_quarto;
+DROP TABLE IF EXISTS tipo_reserva;
 
 CREATE TABLE tipo_reserva (
     id_tiporeserva INT,
